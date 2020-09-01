@@ -1,6 +1,7 @@
 #' @importFrom flipTransformations RemoveMissingLevelsFromFactors
 #' @importFrom flipData DataFormula
 #' @importFrom stats update.formula
+#' @importFrom survey make.formula regTermTest
 computeInteractionCrosstab <- function(result, interaction.name, interaction.label,
                                        formula.with.interaction, importance,
                                        importance.absolute, internal.loop, ...)
@@ -47,6 +48,13 @@ computeInteractionCrosstab <- function(result, interaction.name, interaction.lab
             cat("atest:", atest, "\n")
             print(result$original)
             print(fit2$original)
+
+            t1 <- attr(terms(result$original), "term.labels")
+            t2 <- attr(terms(fit2$original), "term.labels")
+            termdiff <- make.formula(setdiff(t2, t1))
+            cat("termdiff\n")
+            print(termdiff)
+            print(regTermTest(fit2$original, termdiff, df = NULL, method = "LRT"))
         }
         res$anova.output <- atmp
         res$full.r2 <- ifelse (result$type == "Linear" & is.null(weights), summary(fit2$original)$r.square,
