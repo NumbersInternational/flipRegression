@@ -41,7 +41,13 @@ computeInteractionCrosstab <- function(result, interaction.name, interaction.lab
             .design <- fit2$design
             assign(".design", .design, envir=.GlobalEnv)
         }
-        atmp <- anova(result$original, fit2$original, test=atest)
+        atmp <- try(anova(result$original, fit2$original, test=atest))
+        if (inherits(atmp, "try-error"))
+        {
+            cat("atest:", atest, "\n")
+            print(result$original)
+            print(fit2$original)
+        }
         res$anova.output <- atmp
         res$full.r2 <- ifelse (result$type == "Linear" & is.null(weights), summary(fit2$original)$r.square,
                                                         1 - deviance(fit2$original)/nullDeviance(result))
